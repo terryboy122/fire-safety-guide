@@ -461,7 +461,7 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
         <p class="sub">有問題、想補充的案例，或發現頁面有錯，都可以在這裡留言。</p>
       </div>
     </div>
-    <form style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px" aria-label="留言板表單">
+    <form id="board-form" style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px" aria-label="留言板表單">
       <div style="margin-bottom:12px">
         <label for="board-name" style="display:block;margin-bottom:6px">稱呼</label>
         <input id="board-name" name="name" type="text" placeholder="例如：陳先生" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)">
@@ -470,9 +470,34 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
         <label for="board-msg" style="display:block;margin-bottom:6px">留言內容</label>
         <textarea id="board-msg" name="message" rows="4" placeholder="寫下你的問題或建議…" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)"></textarea>
       </div>
-      <button type="submit" disabled style="background:var(--muted);color:#fff;border:0;border-radius:999px;padding:10px 22px;cursor:not-allowed;opacity:.7">送出留言（後端連接後開放）</button>
+      <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>請勿填寫<input name="website" type="text" tabindex="-1" autocomplete="off"></label></div><button id="board-submit" class="btn" type="submit">送出留言</button><p id="board-status" style="margin:12px 0 0;color:var(--muted)"></p>
       <p style="margin:12px 0 0;color:var(--muted)">留言只會傳給站主，不會公開顯示在頁面上。</p>
     </form>
+<script>
+(function(){
+  var form = document.getElementById('board-form');
+  if(!form) return;
+  form.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var name = document.getElementById('board-name').value.trim();
+    var msg = document.getElementById('board-msg').value.trim();
+    var hp = form.querySelector('input[name="website"]').value.trim();
+    var status = document.getElementById('board-status');
+    var btn = document.getElementById('board-submit');
+    if(!name || !msg){ status.textContent = '請填寫稱呼與留言內容。'; return; }
+    btn.disabled = true;
+    status.textContent = '傳送中…';
+    fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, message: msg, website: hp }) })
+      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+      .then(function(res){
+        if(res.ok && res.d.ok){ status.textContent = '留言已送出，謝謝！'; form.reset(); }
+        else { status.textContent = '送出失敗，請稍後再試。'; }
+        btn.disabled = false;
+      })
+      .catch(function(){ status.textContent = '送出失敗，請檢查網路後再試。'; btn.disabled = false; });
+  });
+})();
+</script>
   </div>
 </section>
 

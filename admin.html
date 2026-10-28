@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>留言管理｜防火教學一頁通</title>
+<style>
+  :root{ --bg:#ffffff; --surface:#ffffff; --ink:#1c1917; --ink-2:#44403c; --muted:#78716c; --line:#e7ddd5; --red:#c81e1e; --red-soft:#fdecec; --shadow:0 10px 30px rgba(28,25,23,.08); --radius:14px; }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#161211; --surface:#201b18; --ink:#f5f0eb; --ink-2:#d6cec7; --muted:#a89e96; --line:#3a322c; --red:#f97066; --red-soft:#3a1f1c; --shadow:0 10px 30px rgba(0,0,0,.4); }
+  }
+  body{ margin:0; font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif; background:var(--bg); color:var(--ink); line-height:1.7; }
+  .wrap{ max-width:760px; margin:0 auto; padding:32px 20px 64px; }
+  h1{ font-size:26px; margin:0 0 8px; }
+  .note{ color:var(--muted); margin:0 0 24px; }
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:20px; }
+  label{ display:block; margin-bottom:6px; font-weight:600; }
+  input[type="password"], input[type="text"]{ width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--ink); font:inherit; margin-bottom:12px; }
+  .btn{ display:inline-block; font:inherit; font-weight:700; border:0; cursor:pointer; background:var(--red); color:#fff; padding:11px 22px; border-radius:10px; font-size:15px; }
+  .btn.secondary{ background:var(--surface); color:var(--ink); border:1.5px solid var(--line); }
+  .btn.danger{ background:var(--surface); color:var(--red); border:1.5px solid var(--line); }
+  .btn:disabled{ opacity:.6; cursor:not-allowed; }
+  .status{ color:var(--muted); margin:12px 0 0; }
+  .status.err{ color:var(--red); }
+  .msg{ border-top:1px solid var(--line); padding:16px 0; }
+  .msg:first-child{ border-top:0; padding-top:0; }
+  .msg-head{ display:flex; justify-content:space-between; gap:12px; align-items:baseline; }
+  .msg-name{ font-weight:700; }
+  .msg-time{ color:var(--muted); font-size:13px; white-space:nowrap; }
+  .msg-body{ white-space:pre-wrap; word-break:break-word; margin:8px 0 0; }
+  .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  a{ color:var(--red); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>留言管理</h1>
+  <p class="note">此頁沒有在公開網站上連結，僅供管理員使用。留言內容不會公開顯示，只有登入後才看得到。</p>
+
+  <div id="setup-box" class="card" hidden>
+    <h2 style="margin-top:0">第一次使用：設定管理密碼</h2>
+    <p class="note">請設定一組 8 字以上的管理密碼，設定後只有知道密碼的人才能看留言。密碼只會以雜湊形式存放，不會以明文保存。</p>
+    <label for="setup-pw">管理密碼</label>
+    <input id="setup-pw" type="password" autocomplete="new-password">
+    <label for="setup-pw2">再輸入一次</label>
+    <input id="setup-pw2" type="password" autocomplete="new-password">
+    <button id="setup-btn" class="btn" type="button">設定密碼</button>
+    <p id="setup-status" class="status"></p>
+  </div>
+
+  <div id="login-box" class="card" hidden>
+    <h2 style="margin-top:0">管理員登入</h2>
+    <label for="login-pw">管理密碼</label>
+    <input id="login-pw" type="password" autocomplete="current-password">
+    <button id="login-btn" class="btn" type="button">登入</button>
+    <p id="login-status" class="status"></p>
+  </div>
+
+  <div id="list-box" hidden>
+    <div class="row" style="margin-bottom:16px">
+      <button id="logout-btn" class="btn secondary" type="button">登出</button>
+      <button id="change-toggle" class="btn secondary" type="button">更改密碼</button>
+      <a href="https://fire-safety-guide.pages.dev/">回防火教學一頁通</a>
+    </div>
+    <div id="change-box" class="card" hidden>
+      <h2 style="margin-top:0">更改密碼</h2>
+      <label for="old-pw">目前密碼</label>
+      <input id="old-pw" type="password" autocomplete="current-password">
+      <label for="new-pw">新密碼（8 字以上）</label>
+      <input id="new-pw" type="password" autocomplete="new-password">
+      <button id="change-btn" class="btn" type="button">確認更改</button>
+      <p id="change-status" class="status"></p>
+    </div>
+    <div class="card">
+      <h2 style="margin-top:0">收到的留言</h2>
+      <div id="msg-list"></div>
+      <p id="list-status" class="status"></p>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var KEY = 'fire-board-admin-pw';
+  function $(id){ return document.getElementById(id); }
+  function show(el, yes){ el.hidden = !yes; }
+  function setStatus(el, text, isErr){
+    el.textContent = text;
+    el.className = 'status' + (isErr ? ' err' : '');
+  }
+  function getPw(){ return sessionStorage.getItem(KEY) || ''; }
+  function authHeaders(){
+    return { 'Authorization': 'Bearer ' + getPw() };
+  }
+  function loadList(){
+    setStatus($('list-status'), '載入中…');
+    fetch('/api/admin/messages', { headers: authHeaders() })
+      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+      .then(function(res){
+        if(!res.ok || !res.d.ok){
+          if(res.d && res.d.error === 'auth'){ setStatus($('list-status'), '密碼不正確，請重新登入。', true); doLogout(); }
+          else { setStatus($('list-status'), '載入失敗，請稍後再試。', true); }
+          return;
+        }
+        var list = $('msg-list');
+        list.textContent = '';
+        var msgs = res.d.messages || [];
+        if(msgs.length === 0){
+          var empty = document.createElement('p');
+          empty.className = 'status';
+          empty.textContent = '目前還沒有留言。';
+          list.appendChild(empty);
+          setStatus($('list-status'), '');
+          return;
+        }
+        msgs.forEach(function(m){
+          var item = document.createElement('div');
+          item.className = 'msg';
+          var head = document.createElement('div');
+          head.className = 'msg-head';
+          var name = document.createElement('span');
+          name.className = 'msg-name';
+          name.textContent = m.name;
+          var time = document.createElement('span');
+          time.className = 'msg-time';
+          time.textContent = new Date(m.created_at).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
+          head.appendChild(name);
+          head.appendChild(time);
+          var body = document.createElement('p');
+          body.className = 'msg-body';
+          body.textContent = m.message;
+          var del = document.createElement('button');
+          del.className = 'btn danger';
+          del.type = 'button';
+          del.textContent = '刪除';
+          del.addEventListener('click', function(){
+            if(!window.confirm('確定要刪除這則留言嗎？')) return;
+            fetch('/api/admin/messages?id=' + m.id, { method: 'DELETE', headers: authHeaders() })
+              .then(function(){ loadList(); });
+          });
+          item.appendChild(head);
+          item.appendChild(body);
+          item.appendChild(del);
+          list.appendChild(item);
+        });
+        setStatus($('list-status'), '');
+      })
+      .catch(function(){ setStatus($('list-status'), '載入失敗，請檢查網路後再試。', true); });
+  }
+  function doLogout(){
+    sessionStorage.removeItem(KEY);
+    show($('list-box'), false);
+    show($('login-box'), true);
+    $('login-pw').value = '';
+  }
+  $('setup-btn').addEventListener('click', function(){
+    var pw = $('setup-pw').value;
+    var pw2 = $('setup-pw2').value;
+    if(pw.length < 8){ setStatus($('setup-status'), '密碼至少要 8 字。', true); return; }
+    if(pw !== pw2){ setStatus($('setup-status'), '兩次輸入的密碼不一樣。', true); return; }
+    $('setup-btn').disabled = true;
+    fetch('/api/admin/setup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: pw }) })
+      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+      .then(function(res){
+        $('setup-btn').disabled = false;
+        if(res.ok && res.d.ok){
+          sessionStorage.setItem(KEY, pw);
+          show($('setup-box'), false);
+          show($('list-box'), true);
+          loadList();
+        } else if(res.d && res.d.error === 'already'){
+          setStatus($('setup-status'), '已經設定過密碼了，請直接登入。', true);
+          show($('setup-box'), false);
+          show($('login-box'), true);
+        } else {
+          setStatus($('setup-status'), '設定失敗，請稍後再試。', true);
+        }
+      })
+      .catch(function(){ $('setup-btn').disabled = false; setStatus($('setup-status'), '設定失敗，請檢查網路後再試。', true); });
+  });
+  $('login-btn').addEventListener('click', function(){
+    var pw = $('login-pw').value;
+    if(!pw){ setStatus($('login-status'), '請輸入密碼。', true); return; }
+    sessionStorage.setItem(KEY, pw);
+    show($('login-box'), false);
+    show($('list-box'), true);
+    loadList();
+  });
+  $('login-pw').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ $('login-btn').click(); }
+  });
+  $('logout-btn').addEventListener('click', doLogout);
+  $('change-toggle').addEventListener('click', function(){
+    show($('change-box'), $('change-box').hidden);
+  });
+  $('change-btn').addEventListener('click', function(){
+    var oldPw = $('old-pw').value;
+    var newPw = $('new-pw').value;
+    if(newPw.length < 8){ setStatus($('change-status'), '新密碼至少要 8 字。', true); return; }
+    fetch('/api/admin/change-password', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + oldPw }, body: JSON.stringify({ new_password: newPw }) })
+      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+      .then(function(res){
+        if(res.ok && res.d.ok){
+          sessionStorage.setItem(KEY, newPw);
+          setStatus($('change-status'), '密碼已更改。');
+          $('old-pw').value = '';
+          $('new-pw').value = '';
+        } else {
+          setStatus($('change-status'), '更改失敗，請確認目前密碼是否正確。', true);
+        }
+      })
+      .catch(function(){ setStatus($('change-status'), '更改失敗，請檢查網路後再試。', true); });
+  });
+  fetch('/api/admin/status')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.ok && d.setup_needed){ show($('setup-box'), true); }
+      else { show($('login-box'), true); }
+    })
+    .catch(function(){ show($('login-box'), true); });
+})();
+</script>
+</body>
+</html>
