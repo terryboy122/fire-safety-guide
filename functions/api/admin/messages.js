@@ -10,7 +10,10 @@ export async function onRequestGet(context) {
     const res = await env.DB.prepare(
       'SELECT id, name, message, created_at FROM messages ORDER BY created_at DESC LIMIT 200'
     ).all();
-    return json({ ok: true, messages: res.results || [] });
+    const st = await env.DB.prepare(
+      'SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(CAST(name AS BLOB)) + LENGTH(CAST(message AS BLOB))), 0) AS b FROM messages'
+    ).first();
+    return json({ ok: true, messages: res.results || [], stats: { count: (st && st.c) || 0, bytes: (st && st.b) || 0 } });
   } catch (e) {
     return json({ ok: false, error: 'server' }, 500);
   }

@@ -74,6 +74,7 @@
     </div>
     <div class="card">
       <h2 style="margin-top:0">收到的留言</h2>
+      <p id="stats-line" class="status" style="margin-bottom:12px"></p>
       <div id="msg-list"></div>
       <p id="list-status" class="status"></p>
     </div>
@@ -105,6 +106,10 @@
         var list = $('msg-list');
         list.textContent = '';
         var msgs = res.d.messages || [];
+        var st = res.d.stats || { count: msgs.length, bytes: 0 };
+        var sb = st.bytes;
+        var ssize = sb < 1024 ? sb + ' 位元組' : (sb < 1048576 ? (sb / 1024).toFixed(1) + ' KB' : (sb / 1048576).toFixed(2) + ' MB');
+        $('stats-line').textContent = '留言總數：' + st.count + ' 則｜內容總大小：約 ' + ssize;
         if(msgs.length === 0){
           var empty = document.createElement('p');
           empty.className = 'status';
