@@ -56,8 +56,16 @@ nav.top .wrap{display:flex;gap:6px;flex-wrap:wrap;padding-top:10px;padding-botto
 nav.top a{white-space:nowrap;color:var(--ink-2);text-decoration:none;font-weight:700;font-size:14px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 nav.top a:hover{color:var(--red);border-color:var(--red)}
 nav.top a.active{background:var(--red);border-color:var(--red);color:#fff}
+.nav-toggle{display:none;background:var(--red);color:#fff;border:0;border-radius:999px;padding:8px 18px;font-weight:700;font-size:14px;cursor:pointer}
 section[id]{scroll-margin-top:76px}
-@media(max-width:700px){section[id]{scroll-margin-top:128px}}
+@media(max-width:700px){
+  section[id]{scroll-margin-top:64px}
+  nav.top{padding:8px 16px}
+  .nav-toggle{display:inline-block}
+  nav.top .wrap{display:none}
+  nav.top.open .wrap{display:flex;flex-direction:column;padding:12px 0 4px}
+  nav.top.open .wrap a{text-align:center}
+}
 /* public notice */
 .unofficial{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--amber);background:var(--amber-soft);border:1px solid var(--amber);border-radius:999px;padding:5px 12px;margin-bottom:14px}
 .public-note{border:1.5px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:22px}
@@ -172,7 +180,8 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
 <div class="emergency">🚨 發現火災：先大聲示警，再打 <strong>119</strong> —— 說清楚地址、起火樓層與受困人數</div>
 
 <nav class="top" aria-label="頁面導覽">
-  <div class="wrap">
+  <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">☰ 目錄</button>
+  <div class="wrap" id="nav-links">
     <a class="nav-link" href="#latest">最新火災</a>
     <a class="nav-link" href="#rules">保命原則</a>
     <a class="nav-link" href="#sim">火場模擬</a>
@@ -185,6 +194,23 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
     <a class="nav-link" href="#pwa">安裝 App</a>
     </div>
 </nav>
+<script>
+(function(){
+  var nav = document.querySelector('nav.top');
+  var btn = document.getElementById('nav-toggle');
+  if(!nav || !btn) return;
+  btn.addEventListener('click', function(){
+    var open = nav.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  nav.querySelectorAll('a.nav-link').forEach(function(a){
+    a.addEventListener('click', function(){
+      nav.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    });
+  });
+})();
+</script>
 
 <!-- ===== 最新火災・分析教學（置頂） ===== -->
 <section class="latest-wrap" id="latest" aria-label="最新火災與分析教學">
