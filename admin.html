@@ -77,6 +77,7 @@
       <p id="stats-files" class="status" style="margin-bottom:4px"></p>
       <p id="stats-msgs" class="status" style="margin-bottom:4px"></p>
       <p id="stats-total" class="status" style="margin-bottom:12px"></p>
+      <p id="stats-push" class="status" style="margin-bottom:12px"></p>
       <div id="msg-list"></div>
       <p id="list-status" class="status"></p>
     </div>
@@ -112,6 +113,10 @@
         var mb = st.bytes;
         var msize = mb < 1024 ? mb + ' 位元組' : (mb < 1048576 ? (mb / 1024).toFixed(1) + ' KB' : (mb / 1048576).toFixed(2) + ' MB');
         $('stats-msgs').textContent = '留言總數：' + st.count + ' 則｜留言內容總大小：約 ' + msize;
+        fetch('/api/admin/push-stats', { headers: authHeaders() })
+          .then(function(r){ return r.json(); })
+          .then(function(d){ if(d.ok){ $('stats-push').textContent = '推播訂閱人數：' + d.count + ' 人'; } })
+          .catch(function(){});
         $('stats-files').textContent = '網站檔案總大小：計算中…';
         $('stats-total').textContent = '';
         fetch('https://api.github.com/repos/terryboy122/fire-safety-guide/git/trees/main?recursive=1')
