@@ -16,13 +16,16 @@ export async function onRequestPost(context) {
     if (!commit_sha || !title || !body) {
       return json({ ok: false, error: 'commit_sha, title and body required' }, 400);
     }
-    // 1. Commit must exist on main.
+    // 1. Commit must exist on main. NOTE (2026-10-28): the api.github.com
+    // check was replaced because unauthenticated API calls from Cloudflare's
+    // shared egress IPs hit the 60/hr rate limit and falsely rejected real
+    // commits. The public commit page is repo-scoped (404 for unknown SHAs)
+    // and is not subject to that API limit.
     const commitRes = await fetch(
-      'https://api.github.com/repos/terryboy122/fire-safety-guide/commits/' + commit_sha,
+      'https://github.com/terryboy122/fire-safety-guide/commit/' + commit_sha,
       {
         headers: {
           'User-Agent': 'fire-safety-guide-push',
-          Accept: 'application/vnd.github+json',
         },
       }
     );
