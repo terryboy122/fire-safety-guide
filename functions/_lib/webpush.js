@@ -47,12 +47,15 @@ async function hmacSha256(keyBytes, data) {
 async function importEcPublic(raw65) {
   const x = b64urlEncode(raw65.slice(1, 33));
   const y = b64urlEncode(raw65.slice(33, 65));
+  // NOTE: a public ECDH key must be imported with empty usages; only the
+  // private key gets 'deriveBits'. Passing 'deriveBits' here throws
+  // "invalid usage" in Workers (this was the 2026-10-28 push failure).
   return crypto.subtle.importKey(
     'jwk',
     { kty: 'EC', crv: 'P-256', x, y, ext: true },
     { name: 'ECDH', namedCurve: 'P-256' },
     false,
-    ['deriveBits']
+    []
   );
 }
 
