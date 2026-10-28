@@ -1,7 +1,7 @@
 // Service worker for 防火教學一頁通 (PWA).
 // Navigation requests are network-first (news updates must never go stale);
 // app-shell assets are cache-first. API requests are never cached.
-const CACHE = 'fire-guide-v1';
+const CACHE = 'fire-guide-v2';
 const SHELL = ['/', '/manifest.json', '/icon-192.png', '/icon-512.png', '/icon-180.png'];
 
 self.addEventListener('install', (e) => {
