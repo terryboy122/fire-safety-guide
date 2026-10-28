@@ -19,17 +19,39 @@ export async function onRequestPost(context) {
     // 1. Commit must exist on main. NOTE (2026-10-28): the api.github.com
     // check was replaced because unauthenticated API calls from Cloudflare's
     // shared egress IPs hit the 60/hr rate limit and falsely rejected real
-    // commits. The public commit page is repo-scoped (404 for unknown SHAs)
-    // and is not subject to that API limit.
-    const commitRes = await fetch(
-      'https://github.com/terryboy122/fire-safety-guide/commit/' + commit_sha,
-      {
-        headers: {
-          'User-Agent': 'fire-safety-guide-push',
-        },
+    // commits. The public commit page is repo-scoped (404 for unknown SHAs).
+    // NOTE 2: github.com web requests from Workers egress IPs are also
+    // intermittently blocked, so fall back to the raw file CDN for the same
+    // commit (200 only if the SHA exists and the file exists at that commit).
+    let commitOk = false;
+    let commitDetail = '';
+    try {
+      const commitRes = await fetch(
+        'https://github.com/terryboy122/fire-safety-guide/commit/' + commit_sha,
+        { headers: { 'User-Agent': 'fire-safety-guide-push' } }
+      );
+      commitOk = commitRes.ok;
+      commitDetail = 'page:' + commitRes.status;
+    } catch (e) {
+      commitDetail = 'page:exception';
+    }
+    if (!commitOk) {
+      try {
+        const rawRes = await fetch(
+          'https://raw.githubusercontent.com/terryboy122/fire-safety-guide/' +
+            commit_sha +
+            '/index.html',
+          { headers: { 'User-Agent': 'fire-safety-guide-push' } }
+        );
+        commitOk = rawRes.ok;
+        commitDetail += ' raw:' + rawRes.status;
+      } catch (e) {
+        commitDetail += ' raw:exception';
       }
-    );
-    if (!commitRes.ok) return json({ ok: false, error: 'unknown commit' }, 400);
+    }
+    if (!commitOk) {
+      return json({ ok: false, error: 'unknown commit', detail: commitDetail }, 400);
+    }
     // 2. Dedup: never send the same commit twice.
     await env.DB.prepare(
       'CREATE TABLE IF NOT EXISTS push_sent (sha TEXT PRIMARY KEY, sent_at INTEGER NOT NULL)'
