@@ -14,9 +14,25 @@ export async function onRequestPost(context) {
     await env.DB.prepare(
       'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, message TEXT NOT NULL, created_at INTEGER NOT NULL)'
     ).run();
+    // Rate limit: same IP at most 1 successful post per 60 seconds.
+    // Only successful posts update the timestamp, so failed validation
+    // attempts do not consume the budget.
+    const ip = request.headers.get('cf-connecting-ip') || 'unknown';
+    await env.DB.prepare(
+      'CREATE TABLE IF NOT EXISTS msg_rate (ip TEXT PRIMARY KEY, last_at INTEGER NOT NULL)'
+    ).run();
+    const last = await env.DB.prepare(
+      'SELECT last_at FROM msg_rate WHERE ip = ?'
+    ).bind(ip).first();
+    if (last && Date.now() - last.last_at < 60000) {
+      return json({ ok: false, error: 'too_fast' }, 429);
+    }
     await env.DB.prepare(
       'INSERT INTO messages (name, message, created_at) VALUES (?, ?, ?)'
     ).bind(name, message, Date.now()).run();
+    await env.DB.prepare(
+      'INSERT OR REPLACE INTO msg_rate (ip, last_at) VALUES (?, ?)'
+    ).bind(ip, Date.now()).run();
     return json({ ok: true });
   } catch (e) {
     return json({ ok: false, error: 'server' }, 500);

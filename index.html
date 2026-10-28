@@ -626,6 +626,7 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
       .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
       .then(function(res){
         if(res.ok && res.d.ok){ status.textContent = '留言已送出，謝謝！'; form.reset(); }
+        else if(res.d && res.d.error === 'too_fast'){ status.textContent = '留言太頻繁，請 60 秒後再試。'; }
         else { status.textContent = '送出失敗，請稍後再試。'; }
         btn.disabled = false;
       })
