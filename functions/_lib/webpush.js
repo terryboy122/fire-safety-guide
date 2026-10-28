@@ -151,10 +151,16 @@ export async function sendWebPush({ endpoint, p256dh, auth, payload, vapidPublic
       },
       body,
     });
-    if (res.status === 404 || res.status === 410) return 'gone';
-    if (res.ok) return 'ok';
-    return 'fail';
+    if (res.status === 404 || res.status === 410) return { status: 'gone', detail: '' };
+    if (res.ok) return { status: 'ok', detail: '' };
+    let detail = '';
+    try {
+      detail = (await res.text()).slice(0, 200);
+    } catch (_) {
+      detail = '';
+    }
+    return { status: 'fail', detail: 'http ' + res.status + ' ' + detail };
   } catch (e) {
-    return 'fail';
+    return { status: 'fail', detail: 'exception ' + String((e && e.message) || e).slice(0, 200) };
   }
 }

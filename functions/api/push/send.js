@@ -61,6 +61,7 @@ export async function onRequestPost(context) {
     const list = subs.results || [];
     let sent = 0;
     let failed = 0;
+    const results = [];
     for (const s of list) {
       const r = await sendWebPush({
         endpoint: s.endpoint,
@@ -70,10 +71,17 @@ export async function onRequestPost(context) {
         vapidPublic,
         vapidPrivate,
       });
-      if (r === 'ok') sent++;
+      let host = '';
+      try {
+        host = new URL(s.endpoint).host;
+      } catch (_) {
+        host = 'bad-endpoint';
+      }
+      results.push({ host, result: r.status, detail: r.detail || '' });
+      if (r.status === 'ok') sent++;
       else {
         failed++;
-        if (r === 'gone') {
+        if (r.status === 'gone') {
           await env.DB.prepare('DELETE FROM push_subscriptions WHERE endpoint = ?')
             .bind(s.endpoint)
             .run();
@@ -83,7 +91,7 @@ export async function onRequestPost(context) {
     await env.DB.prepare('INSERT INTO push_sent (sha, sent_at) VALUES (?, ?)')
       .bind(commit_sha, Date.now())
       .run();
-    return json({ ok: true, sent, failed, total: list.length });
+    return json({ ok: true, sent, failed, total: list.length, results });
   } catch (e) {
     return json({ ok: false, error: 'server' }, 500);
   }
