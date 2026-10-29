@@ -87,11 +87,12 @@
     </div>
     <div class="card">
       <h2 style="margin-top:0">雲端備份</h2>
-      <p class="note">把留言、推播訂閱備份到雲端（R2），檔名帶日期，不會覆蓋舊備份。</p>
+      <p class="note">把留言、推播訂閱備份到雲端（R2），只保留最新 3 筆，舊備份會自動刪除。</p>
       <div class="row">
         <button id="backup-btn" class="btn" type="button">備份到雲端</button>
       </div>
       <p id="backup-status" class="status"></p>
+      <div id="backup-list"></div>
     </div>
     <div class="card">
       <h2 style="margin-top:0">收到的留言</h2>
@@ -266,6 +267,7 @@
           show($('setup-box'), false);
           show($('list-box'), true);
           loadList();
+          loadBackupList();
         } else if(res.d && res.d.error === 'already'){
           setStatus($('setup-status'), '已經設定過密碼了，請直接登入。', true);
           show($('setup-box'), false);
@@ -283,10 +285,49 @@
     show($('login-box'), false);
     show($('list-box'), true);
     loadList();
+    loadBackupList();
   });
   $('login-pw').addEventListener('keydown', function(e){
     if(e.key === 'Enter'){ $('login-btn').click(); }
   });
+  function fmtSize(b){
+    return b < 1024 ? b + ' 位元組' : (b < 1048576 ? (b / 1024).toFixed(1) + ' KB' : (b / 1048576).toFixed(2) + ' MB');
+  }
+  function loadBackupList(){
+    var box = $('backup-list');
+    if(!box) return;
+    fetch('/api/admin/backups', { headers: authHeaders() })
+      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
+      .then(function(res){
+        box.textContent = '';
+        if(!res.ok || !res.d.ok){
+          if(res.d && res.d.error === 'auth'){ doLogout(); }
+          return;
+        }
+        var items = res.d.backups || [];
+        if(items.length === 0){
+          var empty = document.createElement('p');
+          empty.className = 'status';
+          empty.textContent = '還沒有備份，按「備份到雲端」建立第一筆。';
+          box.appendChild(empty);
+          return;
+        }
+        items.forEach(function(b){
+          var row = document.createElement('div');
+          row.className = 'stat-row';
+          var lab = document.createElement('span');
+          lab.className = 'stat-label';
+          lab.textContent = new Date(b.uploaded).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
+          var val = document.createElement('span');
+          val.className = 'stat-value';
+          val.textContent = fmtSize(b.size);
+          row.appendChild(lab);
+          row.appendChild(val);
+          box.appendChild(row);
+        });
+      })
+      .catch(function(){});
+  }
   $('backup-btn').addEventListener('click', function(){
     setStatus($('backup-status'), '備份中…');
     $('backup-btn').disabled = true;
@@ -295,7 +336,8 @@
       .then(function(res){
         $('backup-btn').disabled = false;
         if(res.ok && res.d.ok){
-          setStatus($('backup-status'), '備份完成：' + res.d.key + '（留言 ' + res.d.counts.messages + ' 則、推播訂閱 ' + res.d.counts.subscriptions + ' 人）');
+          setStatus($('backup-status'), '備份完成：' + res.d.key + '（留言 ' + res.d.counts.messages + ' 則、推播訂閱 ' + res.d.counts.subscriptions + ' 人）' + (res.d.deleted ? '（已刪除 ' + res.d.deleted + ' 筆舊備份）' : ''));
+          loadBackupList();
         } else if(res.d && res.d.error === 'auth'){ setStatus($('backup-status'), '密碼不正確，請重新登入。', true); doLogout(); }
         else if(res.d && res.d.error === 'not_configured'){ setStatus($('backup-status'), '尚未綁定雲端備份空間，請先完成 R2 綁定再試。', true); }
         else { setStatus($('backup-status'), '備份失敗，請稍後再試。', true); }

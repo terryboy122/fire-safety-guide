@@ -44,9 +44,21 @@ export async function onRequestPost(context) {
     await env.BACKUPS.put(key, JSON.stringify(data), {
       httpMetadata: { contentType: 'application/json' },
     });
+    // Keep only the latest 3 backups; delete older files. A pruning
+    // failure must not fail the backup itself.
+    let deleted = 0;
+    try {
+      const all = await listAll(env.BACKUPS, 'backup-');
+      all.sort((a, b) => b.uploaded - a.uploaded);
+      for (const o of all.slice(3)) {
+        await env.BACKUPS.delete(o.key);
+        deleted++;
+      }
+    } catch (e) { /* keep the new backup even if pruning fails */ }
     return json({
       ok: true,
       key,
+      deleted,
       counts: {
         messages: data.messages.length,
         subscriptions: data.push_subscriptions.length,
@@ -56,6 +68,17 @@ export async function onRequestPost(context) {
   } catch (e) {
     return json({ ok: false, error: 'server' }, 500);
   }
+}
+
+async function listAll(bucket, prefix) {
+  let out = [];
+  let cursor;
+  do {
+    const page = await bucket.list({ prefix, cursor });
+    out = out.concat(page.objects || []);
+    cursor = page.truncated ? page.cursor : undefined;
+  } while (cursor);
+  return out;
 }
 
 async function checkAuth(request, env) {
