@@ -32,6 +32,17 @@
   .msg-body{ white-space:pre-wrap; word-break:break-word; margin:8px 0 0; }
   .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
   a{ color:var(--red); }
+  .stats{ margin-bottom:16px; }
+  .stat-row{ display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px solid var(--line); }
+  .stat-row:last-child{ border-bottom:0; }
+  .stat-label{ color:var(--muted); }
+  .stat-value{ font-weight:700; text-align:right; }
+  .msg-head{ flex-wrap:wrap; row-gap:4px; }
+  .msg .btn.danger{ margin-top:12px; padding:8px 18px; font-size:14px; }
+  @media (max-width:700px){
+    .msg-head{ flex-direction:column; align-items:flex-start; }
+    .msg-time{ white-space:normal; }
+  }
 </style>
 </head>
 <body>
@@ -83,10 +94,7 @@
     </div>
     <div class="card">
       <h2 style="margin-top:0">收到的留言</h2>
-      <p id="stats-files" class="status" style="margin-bottom:4px"></p>
-      <p id="stats-msgs" class="status" style="margin-bottom:4px"></p>
-      <p id="stats-total" class="status" style="margin-bottom:12px"></p>
-      <p id="stats-push" class="status" style="margin-bottom:12px"></p>
+      <div id="stats-box" class="stats"></div>
       <div class="row" style="margin-bottom:12px">
         <label for="site-filter" style="margin-bottom:0">顯示：</label>
         <select id="site-filter" style="width:auto;margin-bottom:0">
@@ -131,25 +139,48 @@
         var st = res.d.stats || { count: msgs.length, bytes: 0 };
         var mb = st.bytes;
         var msize = mb < 1024 ? mb + ' 位元組' : (mb < 1048576 ? (mb / 1024).toFixed(1) + ' KB' : (mb / 1048576).toFixed(2) + ' MB');
-        $('stats-msgs').textContent = '留言總數：' + st.count + ' 則｜留言內容總大小：約 ' + msize;
+        var stats = { files: '計算中…', msgs: st.count + ' 則（內容約 ' + msize + '）', total: '計算中…', push: '—' };
+        var statsBox = $('stats-box');
+        function renderStats(){
+          statsBox.textContent = '';
+          var rows = [
+            ['網站檔案', stats.files],
+            ['留言', stats.msgs],
+            ['總站大小', stats.total],
+            ['推播訂閱', stats.push]
+          ];
+          rows.forEach(function(r){
+            var row = document.createElement('div');
+            row.className = 'stat-row';
+            var lab = document.createElement('span');
+            lab.className = 'stat-label';
+            lab.textContent = r[0];
+            var val = document.createElement('span');
+            val.className = 'stat-value';
+            val.textContent = r[1];
+            row.appendChild(lab);
+            row.appendChild(val);
+            statsBox.appendChild(row);
+          });
+        }
+        renderStats();
         fetch('/api/admin/push-stats', { headers: authHeaders() })
           .then(function(r){ return r.json(); })
-          .then(function(d){ if(d.ok){ $('stats-push').textContent = '推播訂閱人數：' + d.count + ' 人'; } })
+          .then(function(d){ if(d.ok){ stats.push = d.count + ' 人'; renderStats(); } })
           .catch(function(){});
-        $('stats-files').textContent = '網站檔案總大小：計算中…';
-        $('stats-total').textContent = '';
         fetch('https://api.github.com/repos/terryboy122/fire-safety-guide/git/trees/main?recursive=1')
           .then(function(r){ return r.json(); })
           .then(function(t){
             var total = 0;
             (t.tree || []).forEach(function(n){ if(n.type === 'blob' && typeof n.size === 'number'){ total += n.size; } });
             var fsize = total < 1024 ? total + ' 位元組' : (total < 1048576 ? (total / 1024).toFixed(1) + ' KB' : (total / 1048576).toFixed(2) + ' MB');
-            $('stats-files').textContent = '網站檔案總大小：約 ' + fsize + '（GitHub 上全部檔案加總）';
+            stats.files = '約 ' + fsize;
             var all = total + mb;
             var asize = all < 1024 ? all + ' 位元組' : (all < 1048576 ? (all / 1024).toFixed(1) + ' KB' : (all / 1048576).toFixed(2) + ' MB');
-            $('stats-total').textContent = '總站大小：約 ' + asize + '（網站檔案＋留言內容）';
+            stats.total = '約 ' + asize;
+            renderStats();
           })
-          .catch(function(){ $('stats-files').textContent = '網站檔案總大小：無法取得'; });
+          .catch(function(){ stats.files = '無法取得'; stats.total = '無法取得'; renderStats(); });
         if(msgs.length === 0){
           var empty = document.createElement('p');
           empty.className = 'status';
