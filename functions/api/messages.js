@@ -12,8 +12,15 @@ export async function onRequestPost(context) {
     if (!message || message.length > 2000) return json({ ok: false, error: 'message' }, 400);
     if (!env.DB) return json({ ok: false, error: 'db' }, 500);
     await env.DB.prepare(
-      'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, message TEXT NOT NULL, created_at INTEGER NOT NULL)'
+      'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, message TEXT NOT NULL, created_at INTEGER NOT NULL, site TEXT NOT NULL DEFAULT \'fire-safety-guide\')'
     ).run();
+    // Unified-admin migration: older tables lack the site column.
+    // Fails silently when the column already exists.
+    try {
+      await env.DB.prepare(
+        "ALTER TABLE messages ADD COLUMN site TEXT NOT NULL DEFAULT 'fire-safety-guide'"
+      ).run();
+    } catch (e) { /* column already exists */ }
     // Rate limit: same IP at most 1 successful post per 60 seconds.
     // Only successful posts update the timestamp, so failed validation
     // attempts do not consume the budget.
@@ -28,8 +35,8 @@ export async function onRequestPost(context) {
       return json({ ok: false, error: 'too_fast' }, 429);
     }
     await env.DB.prepare(
-      'INSERT INTO messages (name, message, created_at) VALUES (?, ?, ?)'
-    ).bind(name, message, Date.now()).run();
+      'INSERT INTO messages (name, message, created_at, site) VALUES (?, ?, ?, ?)'
+    ).bind(name, message, Date.now(), 'fire-safety-guide').run();
     await env.DB.prepare(
       'INSERT OR REPLACE INTO msg_rate (ip, last_at) VALUES (?, ?)'
     ).bind(ip, Date.now()).run();

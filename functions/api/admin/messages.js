@@ -5,14 +5,25 @@ export async function onRequestGet(context) {
   try {
     if (!(await checkAuth(request, env))) return json({ ok: false, error: 'auth' }, 401);
     await env.DB.prepare(
-      'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, message TEXT NOT NULL, created_at INTEGER NOT NULL)'
+      'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, message TEXT NOT NULL, created_at INTEGER NOT NULL, site TEXT NOT NULL DEFAULT \'fire-safety-guide\')'
     ).run();
+    // Unified-admin migration: older tables lack the site column.
+    try {
+      await env.DB.prepare(
+        "ALTER TABLE messages ADD COLUMN site TEXT NOT NULL DEFAULT 'fire-safety-guide'"
+      ).run();
+    } catch (e) { /* column already exists */ }
+    const url = new URL(request.url);
+    const siteParam = url.searchParams.get('site') || '';
+    const allowedSites = ['fire-safety-guide', 'elder-safety-guide'];
+    const filter = allowedSites.includes(siteParam) ? siteParam : null;
+    const where = filter ? ' WHERE site = ?' : '';
     const res = await env.DB.prepare(
-      'SELECT id, name, message, created_at FROM messages ORDER BY created_at DESC LIMIT 200'
-    ).all();
+      'SELECT id, site, name, message, created_at FROM messages' + where + ' ORDER BY created_at DESC LIMIT 200'
+    ).bind(...(filter ? [filter] : [])).all();
     const st = await env.DB.prepare(
-      'SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(CAST(name AS BLOB)) + LENGTH(CAST(message AS BLOB))), 0) AS b FROM messages'
-    ).first();
+      'SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(CAST(name AS BLOB)) + LENGTH(CAST(message AS BLOB))), 0) AS b FROM messages' + where
+    ).bind(...(filter ? [filter] : [])).first();
     return json({ ok: true, messages: res.results || [], stats: { count: (st && st.c) || 0, bytes: (st && st.b) || 0 } });
   } catch (e) {
     return json({ ok: false, error: 'server' }, 500);

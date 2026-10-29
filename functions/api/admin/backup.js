@@ -9,8 +9,14 @@ export async function onRequestPost(context) {
     if (!env.DB) return json({ ok: false, error: 'db' }, 500);
     if (!env.BACKUPS) return json({ ok: false, error: 'not_configured' }, 500);
     await env.DB.prepare(
-      'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, message TEXT NOT NULL, created_at INTEGER NOT NULL)'
+      'CREATE TABLE IF NOT EXISTS messages (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, message TEXT NOT NULL, created_at INTEGER NOT NULL, site TEXT NOT NULL DEFAULT \'fire-safety-guide\')'
     ).run();
+    // Unified-admin migration: older tables lack the site column.
+    try {
+      await env.DB.prepare(
+        "ALTER TABLE messages ADD COLUMN site TEXT NOT NULL DEFAULT 'fire-safety-guide'"
+      ).run();
+    } catch (e) { /* column already exists */ }
     await env.DB.prepare(
       'CREATE TABLE IF NOT EXISTS push_subscriptions (endpoint TEXT PRIMARY KEY, p256dh TEXT NOT NULL, auth TEXT NOT NULL, created_at INTEGER NOT NULL)'
     ).run();
@@ -18,7 +24,7 @@ export async function onRequestPost(context) {
       'CREATE TABLE IF NOT EXISTS push_sent (sha TEXT PRIMARY KEY, sent_at INTEGER NOT NULL)'
     ).run();
     const msgs = await env.DB.prepare(
-      'SELECT id, name, message, created_at FROM messages ORDER BY created_at ASC'
+      'SELECT id, site, name, message, created_at FROM messages ORDER BY created_at ASC'
     ).all();
     const subs = await env.DB.prepare(
       'SELECT endpoint, p256dh, auth, created_at FROM push_subscriptions ORDER BY created_at ASC'

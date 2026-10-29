@@ -16,7 +16,8 @@
   .note{ color:var(--muted); margin:0 0 24px; }
   .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px; margin-bottom:20px; }
   label{ display:block; margin-bottom:6px; font-weight:600; }
-  input[type="password"], input[type="text"]{ width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--ink); font:inherit; margin-bottom:12px; }
+  input[type="password"], input[type="text"], select{ width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid var(--line); border-radius:10px; background:var(--bg); color:var(--ink); font:inherit; margin-bottom:12px; }
+  .site-badge{ display:inline-block; font-size:12px; font-weight:700; padding:2px 10px; border-radius:999px; border:1.5px solid var(--line); color:var(--muted); margin-right:8px; white-space:nowrap; }
   .btn{ display:inline-block; font:inherit; font-weight:700; border:0; cursor:pointer; background:var(--red); color:#fff; padding:11px 22px; border-radius:10px; font-size:15px; }
   .btn.secondary{ background:var(--surface); color:var(--ink); border:1.5px solid var(--line); }
   .btn.danger{ background:var(--surface); color:var(--red); border:1.5px solid var(--line); }
@@ -86,6 +87,14 @@
       <p id="stats-msgs" class="status" style="margin-bottom:4px"></p>
       <p id="stats-total" class="status" style="margin-bottom:12px"></p>
       <p id="stats-push" class="status" style="margin-bottom:12px"></p>
+      <div class="row" style="margin-bottom:12px">
+        <label for="site-filter" style="margin-bottom:0">顯示：</label>
+        <select id="site-filter" style="width:auto;margin-bottom:0">
+          <option value="all">全部站台</option>
+          <option value="fire-safety-guide">防火情報站</option>
+          <option value="elder-safety-guide">長輩居家安全</option>
+        </select>
+      </div>
       <div id="msg-list"></div>
       <p id="list-status" class="status"></p>
     </div>
@@ -106,7 +115,9 @@
   }
   function loadList(){
     setStatus($('list-status'), '載入中…');
-    fetch('/api/admin/messages', { headers: authHeaders() })
+    var sf = $('site-filter') ? $('site-filter').value : 'all';
+    var q = (sf && sf !== 'all') ? '?site=' + encodeURIComponent(sf) : '';
+    fetch('/api/admin/messages' + q, { headers: authHeaders() })
       .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, d: d }; }); })
       .then(function(res){
         if(!res.ok || !res.d.ok){
@@ -152,12 +163,16 @@
           item.className = 'msg';
           var head = document.createElement('div');
           head.className = 'msg-head';
+          var badge = document.createElement('span');
+          badge.className = 'site-badge';
+          badge.textContent = m.site === 'elder-safety-guide' ? '長輩居家安全' : '防火情報站';
           var name = document.createElement('span');
           name.className = 'msg-name';
           name.textContent = m.name;
           var time = document.createElement('span');
           time.className = 'msg-time';
           time.textContent = new Date(m.created_at).toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
+          head.appendChild(badge);
           head.appendChild(name);
           head.appendChild(time);
           var body = document.createElement('p');
@@ -238,6 +253,7 @@
       })
       .catch(function(){ $('backup-btn').disabled = false; setStatus($('backup-status'), '備份失敗，請檢查網路後再試。', true); });
   });
+  $('site-filter').addEventListener('change', loadList);
   $('logout-btn').addEventListener('click', doLogout);
   $('change-toggle').addEventListener('click', function(){
     show($('change-box'), $('change-box').hidden);
