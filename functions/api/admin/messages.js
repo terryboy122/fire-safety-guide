@@ -24,7 +24,12 @@ export async function onRequestGet(context) {
     const st = await env.DB.prepare(
       'SELECT COUNT(*) AS c, COALESCE(SUM(LENGTH(CAST(name AS BLOB)) + LENGTH(CAST(message AS BLOB))), 0) AS b FROM messages' + where
     ).bind(...(filter ? [filter] : [])).first();
-    return json({ ok: true, messages: res.results || [], stats: { count: (st && st.c) || 0, bytes: (st && st.b) || 0 } });
+    const bySiteRows = await env.DB.prepare(
+      'SELECT site, COUNT(*) AS c FROM messages GROUP BY site'
+    ).all();
+    const bySite = {};
+    (bySiteRows.results || []).forEach(function(r){ bySite[r.site] = r.c; });
+    return json({ ok: true, messages: res.results || [], stats: { count: (st && st.c) || 0, bytes: (st && st.b) || 0, bySite: bySite } });
   } catch (e) {
     return json({ ok: false, error: 'server' }, 500);
   }

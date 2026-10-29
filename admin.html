@@ -139,15 +139,24 @@
         var st = res.d.stats || { count: msgs.length, bytes: 0 };
         var mb = st.bytes;
         var msize = mb < 1024 ? mb + ' 位元組' : (mb < 1048576 ? (mb / 1024).toFixed(1) + ' KB' : (mb / 1048576).toFixed(2) + ' MB');
-        var stats = { files: '計算中…', msgs: st.count + ' 則（內容約 ' + msize + '）', total: '計算中…', push: '—' };
+        var stats = { files: '計算中…', msgs: '', push: '—' };
+        if (sf && sf !== 'all') {
+          stats.msgs = st.count + ' 則' + (st.count > 0 ? '（內容約 ' + msize + '）' : '');
+        } else {
+          var bySite = st.bySite || {};
+          var siteNames = { 'fire-safety-guide': '防火情報站', 'elder-safety-guide': '長輩居家安全' };
+          var parts = [];
+          ['fire-safety-guide', 'elder-safety-guide'].forEach(function(s){ if (bySite[s] !== undefined) parts.push(siteNames[s] + ' ' + bySite[s] + ' 則'); });
+          Object.keys(bySite).forEach(function(s){ if (s !== 'fire-safety-guide' && s !== 'elder-safety-guide') parts.push(s + ' ' + bySite[s] + ' 則'); });
+          stats.msgs = '共 ' + st.count + ' 則' + (parts.length ? '（' + parts.join('、') + '）' : '');
+        }
         var statsBox = $('stats-box');
         function renderStats(){
           statsBox.textContent = '';
           var rows = [
-            ['網站檔案', stats.files],
+            ['防火站檔案', stats.files],
             ['留言', stats.msgs],
-            ['總站大小', stats.total],
-            ['推播訂閱', stats.push]
+            ['推播訂閱（防火站）', stats.push]
           ];
           rows.forEach(function(r){
             var row = document.createElement('div');
@@ -175,12 +184,9 @@
             (t.tree || []).forEach(function(n){ if(n.type === 'blob' && typeof n.size === 'number'){ total += n.size; } });
             var fsize = total < 1024 ? total + ' 位元組' : (total < 1048576 ? (total / 1024).toFixed(1) + ' KB' : (total / 1048576).toFixed(2) + ' MB');
             stats.files = '約 ' + fsize;
-            var all = total + mb;
-            var asize = all < 1024 ? all + ' 位元組' : (all < 1048576 ? (all / 1024).toFixed(1) + ' KB' : (all / 1048576).toFixed(2) + ' MB');
-            stats.total = '約 ' + asize;
             renderStats();
           })
-          .catch(function(){ stats.files = '無法取得'; stats.total = '無法取得'; renderStats(); });
+          .catch(function(){ stats.files = '無法取得'; renderStats(); });
         if(msgs.length === 0){
           var empty = document.createElement('p');
           empty.className = 'status';
