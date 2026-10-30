@@ -142,14 +142,14 @@
         var st = res.d.stats || { count: msgs.length, bytes: 0 };
         var mb = st.bytes;
         var msize = mb < 1024 ? mb + ' 位元組' : (mb < 1048576 ? (mb / 1024).toFixed(1) + ' KB' : (mb / 1048576).toFixed(2) + ' MB');
-        var stats = { files: '計算中…', elderFiles: '計算中…', msgs: '', push: '—' };
+        var stats = { files: '計算中…', elderFiles: '計算中…', sleepFiles: '計算中…', msgs: '', push: '—' };
         if (sf && sf !== 'all') {
           stats.msgs = st.count + ' 則' + (st.count > 0 ? '（內容約 ' + msize + '）' : '');
         } else {
           var bySite = st.bySite || {};
           var siteNames = { 'fire-safety-guide': '防火情報站', 'elder-safety-guide': '長輩居家安全', 'sleep-environment-guide': '睡眠環境指南' };
           var parts = [];
-          ['fire-safety-guide', 'elder-safety-guide', 'sleep-environment-guide'].forEach(function(s){ if (bySite[s] !== undefined) parts.push(siteNames[s] + ' ' + bySite[s] + ' 則'); });
+          ['fire-safety-guide', 'elder-safety-guide', 'sleep-environment-guide'].forEach(function(s){ parts.push(siteNames[s] + ' ' + (bySite[s] || 0) + ' 則'); });
           Object.keys(bySite).forEach(function(s){ if (s !== 'fire-safety-guide' && s !== 'elder-safety-guide' && s !== 'sleep-environment-guide') parts.push(s + ' ' + bySite[s] + ' 則'); });
           stats.msgs = '共 ' + st.count + ' 則' + (parts.length ? '（' + parts.join('、') + '）' : '');
         }
@@ -159,6 +159,7 @@
           var rows = [
             ['防火站檔案', stats.files],
             ['長輩站檔案', stats.elderFiles],
+            ['睡眠站檔案', stats.sleepFiles],
             ['留言', stats.msgs],
             ['推播訂閱（防火站）', stats.push]
           ];
@@ -201,6 +202,16 @@
             renderStats();
           })
           .catch(function(){ stats.elderFiles = '無法取得'; renderStats(); });
+        fetch('https://api.github.com/repos/terryboy122/sleep-environment-guide/git/trees/main?recursive=1')
+          .then(function(r){ return r.json(); })
+          .then(function(t){
+            var total = 0;
+            (t.tree || []).forEach(function(n){ if(n.type === 'blob' && typeof n.size === 'number'){ total += n.size; } });
+            var fsize = total < 1024 ? total + ' 位元組' : (total < 1048576 ? (total / 1024).toFixed(1) + ' KB' : (total / 1048576).toFixed(2) + ' MB');
+            stats.sleepFiles = '約 ' + fsize;
+            renderStats();
+          })
+          .catch(function(){ stats.sleepFiles = '無法取得'; renderStats(); });
         if(msgs.length === 0){
           var empty = document.createElement('p');
           empty.className = 'status';
