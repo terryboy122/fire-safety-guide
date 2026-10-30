@@ -183,7 +183,7 @@ section[id]{scroll-margin-top:76px}
 .video p{font-size:14px;color:var(--ink-2);flex:1}
 @media(max-width:900px){.videos{grid-template-columns:1fr}}
 .scroll-hint{display:none}
-@media(max-width:700px){#videos .videos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:14px;padding-bottom:10px}#videos .video{flex:0 0 78vw;max-width:320px;scroll-snap-align:start}#videos .scroll-hint{display:block;text-align:center;color:var(--ink-2);font-size:13px;margin:10px 0 0}}
+@media(max-width:700px){#videos .videos,#latest-videos .videos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;gap:14px;padding-bottom:10px}#videos .video,#latest-videos .video{flex:0 0 78vw;max-width:320px;scroll-snap-align:start}#videos .scroll-hint,#latest-videos .scroll-hint{display:block;text-align:center;color:var(--ink-2);font-size:13px;margin:10px 0 0}}
 /* checklist */
 .checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 28px;list-style:none;margin:0;padding:0}
 .checks li{padding:11px 0 11px 34px;position:relative;border-bottom:1px dashed var(--line);font-size:15px}
@@ -208,6 +208,7 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
   <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">☰ 目錄</button>
   <div class="wrap" id="nav-links">
     <a class="nav-link" href="#latest">最新火災</a>
+    <a class="nav-link" href="#latest-videos">最新影片</a>
     <a class="nav-link" href="#rules">保命原則</a>
     <a class="nav-link" href="#sim">火場模擬</a>
     <a class="nav-link" href="#cases">案例簡析</a>
@@ -317,6 +318,98 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
   </div>
 </section>
 
+<!-- ===== 最新火災影片（7 天內新聞報導，舊的自動下架） ===== -->
+<section class="section section-soft" id="latest-videos">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <h2>🎬 最新火災影片</h2>
+        <p class="sub">最近 7 天內的新聞報導影片，由新到舊排列；超過 7 天的會自動下架。點預覽圖或按鈕，就能在 YouTube 看完整影片。</p>
+      </div>
+    </div>
+    <div class="videos">
+      <article class="video">
+        <a class="thumb" href="https://www.youtube.com/watch?v=JX-KCqXpdx0" target="_blank" rel="noopener" aria-label="在 YouTube 觀看：左營分租套房火警">
+          <img src="https://i.ytimg.com/vi/JX-KCqXpdx0/hqdefault.jpg" alt="YouTube 影片預覽圖：左營分租套房火警" width="480" height="360" loading="lazy" referrerpolicy="no-referrer">
+          <span class="play" aria-hidden="true">▶</span>
+          <span class="yt-badge">YouTube</span>
+        </a>
+        <div class="video-body">
+          <div class="plat">YOUTUBE ・ TVBS 新聞</div>
+          <h3>左營分租套房：木板隔房、弱勢長輩逃生不及</h3>
+          <p>77 歲洗腎長輩行動不便逃生不及；三層出租公寓以木板輕裝潢隔出多間雅房，租金便宜卻暗藏風險。</p>
+          <a class="btn" href="https://www.youtube.com/watch?v=JX-KCqXpdx0" target="_blank" rel="noopener">▶ 在 YouTube 觀看</a>
+        </div>
+      </article>
+      <article class="video">
+        <a class="thumb" href="https://www.youtube.com/watch?v=sOoIZSGFA68" target="_blank" rel="noopener" aria-label="在 YouTube 觀看：台中西屯鐵皮工廠火警">
+          <img src="https://i.ytimg.com/vi/sOoIZSGFA68/hqdefault.jpg" alt="YouTube 影片預覽圖：台中西屯鐵皮工廠火警" width="480" height="360" loading="lazy" referrerpolicy="no-referrer">
+          <span class="play" aria-hidden="true">▶</span>
+          <span class="yt-badge">YouTube</span>
+        </a>
+        <div class="video-body">
+          <div class="plat">YOUTUBE ・ TVBS 新聞</div>
+          <h3>台中西屯鐵皮工廠竄火釀 1 傷</h3>
+          <p>鐵皮工廠下午起火，疑堆放大量塑膠，刺鼻黑煙竄天，1 名男員工燙傷送醫，下風處民眾緊閉門窗。</p>
+          <a class="btn" href="https://www.youtube.com/watch?v=sOoIZSGFA68" target="_blank" rel="noopener">▶ 在 YouTube 觀看</a>
+        </div>
+      </article>
+      <article class="video">
+        <a class="thumb" href="https://www.youtube.com/watch?v=3SvzQCxxLA8" target="_blank" rel="noopener" aria-label="在 YouTube 觀看：桃園大樓火警">
+          <img src="https://i.ytimg.com/vi/3SvzQCxxLA8/hqdefault.jpg" alt="YouTube 影片預覽圖：桃園大樓火警" width="480" height="360" loading="lazy" referrerpolicy="no-referrer">
+          <span class="play" aria-hidden="true">▶</span>
+          <span class="yt-badge">YouTube</span>
+        </a>
+        <div class="video-body">
+          <div class="plat">YOUTUBE ・ TVBS 新聞</div>
+          <h3>桃園大樓惡火：2 樓診所醫師不治</h3>
+          <p>10 層大樓 2 樓婦產科診所起火，濃煙密布，8 人送醫，80 歲醫師倒臥櫃台旁不治。</p>
+          <a class="btn" href="https://www.youtube.com/watch?v=3SvzQCxxLA8" target="_blank" rel="noopener">▶ 在 YouTube 觀看</a>
+        </div>
+      </article>
+      <article class="video">
+        <a class="thumb" href="https://www.youtube.com/watch?v=uc03wg5ScPo" target="_blank" rel="noopener" aria-label="在 YouTube 觀看：燕巢神轎工作室火警">
+          <img src="https://i.ytimg.com/vi/uc03wg5ScPo/hqdefault.jpg" alt="YouTube 影片預覽圖：燕巢神轎工作室火警" width="480" height="360" loading="lazy" referrerpolicy="no-referrer">
+          <span class="play" aria-hidden="true">▶</span>
+          <span class="yt-badge">YouTube</span>
+        </a>
+        <div class="video-body">
+          <div class="plat">YOUTUBE ・ 三立新聞</div>
+          <h3>燕巢神轎工作室陷火海</h3>
+          <p>50 年神轎行鐵皮廠房晚間起火，檜木樟木助燃延燒鄰宅，成品半成品全毀。</p>
+          <a class="btn" href="https://www.youtube.com/watch?v=uc03wg5ScPo" target="_blank" rel="noopener">▶ 在 YouTube 觀看</a>
+        </div>
+      </article>
+      <article class="video">
+        <a class="thumb" href="https://www.youtube.com/watch?v=AmIFa6k8SQY" target="_blank" rel="noopener" aria-label="在 YouTube 觀看：新竹嘉晶電子廠火警">
+          <img src="https://i.ytimg.com/vi/AmIFa6k8SQY/hqdefault.jpg" alt="YouTube 影片預覽圖：新竹嘉晶電子廠火警" width="480" height="360" loading="lazy" referrerpolicy="no-referrer">
+          <span class="play" aria-hidden="true">▶</span>
+          <span class="yt-badge">YouTube</span>
+        </a>
+        <div class="video-body">
+          <div class="plat">YOUTUBE ・ 華視新聞</div>
+          <h3>竹科嘉晶電子廠陷火海</h3>
+          <p>創新廠屋頂竄火舌黑煙狂竄，3 樓鋰電池悶燒，消防射水灌救降溫排煙。</p>
+          <a class="btn" href="https://www.youtube.com/watch?v=AmIFa6k8SQY" target="_blank" rel="noopener">▶ 在 YouTube 觀看</a>
+        </div>
+      </article>
+      <article class="video">
+        <a class="thumb" href="https://www.youtube.com/watch?v=FxesPZwhAPg" target="_blank" rel="noopener" aria-label="在 YouTube 觀看：路竹成衣廠倉庫火警">
+          <img src="https://i.ytimg.com/vi/FxesPZwhAPg/hqdefault.jpg" alt="YouTube 影片預覽圖：路竹成衣廠倉庫火警" width="480" height="360" loading="lazy" referrerpolicy="no-referrer">
+          <span class="play" aria-hidden="true">▶</span>
+          <span class="yt-badge">YouTube</span>
+        </a>
+        <div class="video-body">
+          <div class="plat">YOUTUBE ・ 公視新聞</div>
+          <h3>路竹成衣廠倉庫火警</h3>
+          <p>成衣大廠倉庫晚間起火，布料易燃物讓火勢一發不可收拾，鄰近國小活動全改室內。</p>
+          <a class="btn" href="https://www.youtube.com/watch?v=FxesPZwhAPg" target="_blank" rel="noopener">▶ 在 YouTube 觀看</a>
+        </div>
+      </article>
+    </div>
+    <p class="scroll-hint">← 左右滑動看更多影片 →</p>
+  </div>
+</section>
 
 <header class="hero">
   <div class="wrap hero-grid">
