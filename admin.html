@@ -74,7 +74,7 @@
       <button id="logout-btn" class="btn secondary" type="button">登出</button>
       <button id="change-toggle" class="btn secondary" type="button">更改密碼</button>
       <a href="https://fire-safety-guide.pages.dev/">回防火情報站</a>
-      <a href="https://elder-safety-guide.pages.dev/">回長輩居家站</a> <a href="https://sleep-environment-guide.pages.dev/">回睡眠環境站</a>
+      <a href="https://elder-safety-guide.pages.dev/">回長輩居家站</a> <a href="https://sleep-environment-guide.pages.dev/">回睡眠環境站</a> <a href="https://ai-drama-guide.pages.dev/">回AI劇場</a>
     </div>
     <div id="change-box" class="card" hidden>
       <h2 style="margin-top:0">更改密碼</h2>
@@ -104,6 +104,7 @@
           <option value="fire-safety-guide">防火情報站</option>
           <option value="elder-safety-guide">長輩居家安全</option>
           <option value="sleep-environment-guide">睡眠環境指南</option>
+          <option value="ai-drama-guide">AI劇場</option>
         </select>
       </div>
       <div id="msg-list"></div>
@@ -142,15 +143,15 @@
         var st = res.d.stats || { count: msgs.length, bytes: 0 };
         var mb = st.bytes;
         var msize = mb < 1024 ? mb + ' 位元組' : (mb < 1048576 ? (mb / 1024).toFixed(1) + ' KB' : (mb / 1048576).toFixed(2) + ' MB');
-        var stats = { files: '計算中…', elderFiles: '計算中…', sleepFiles: '計算中…', msgs: '', push: '—' };
+        var stats = { files: '計算中…', elderFiles: '計算中…', sleepFiles: '計算中…', dramaFiles: '計算中…', msgs: '', push: '—' };
         if (sf && sf !== 'all') {
           stats.msgs = st.count + ' 則' + (st.count > 0 ? '（內容約 ' + msize + '）' : '');
         } else {
           var bySite = st.bySite || {};
-          var siteNames = { 'fire-safety-guide': '防火情報站', 'elder-safety-guide': '長輩居家安全', 'sleep-environment-guide': '睡眠環境指南' };
+          var siteNames = { 'fire-safety-guide': '防火情報站', 'elder-safety-guide': '長輩居家安全', 'sleep-environment-guide': '睡眠環境指南', 'ai-drama-guide': 'AI劇場' };
           var parts = [];
-          ['fire-safety-guide', 'elder-safety-guide', 'sleep-environment-guide'].forEach(function(s){ parts.push(siteNames[s] + ' ' + (bySite[s] || 0) + ' 則'); });
-          Object.keys(bySite).forEach(function(s){ if (s !== 'fire-safety-guide' && s !== 'elder-safety-guide' && s !== 'sleep-environment-guide') parts.push(s + ' ' + bySite[s] + ' 則'); });
+          ['fire-safety-guide', 'elder-safety-guide', 'sleep-environment-guide', 'ai-drama-guide'].forEach(function(s){ parts.push(siteNames[s] + ' ' + (bySite[s] || 0) + ' 則'); });
+          Object.keys(bySite).forEach(function(s){ if (s !== 'fire-safety-guide' && s !== 'elder-safety-guide' && s !== 'sleep-environment-guide' && s !== 'ai-drama-guide') parts.push(s + ' ' + bySite[s] + ' 則'); });
           stats.msgs = '共 ' + st.count + ' 則' + (parts.length ? '（' + parts.join('、') + '）' : '');
         }
         var statsBox = $('stats-box');
@@ -160,6 +161,7 @@
             ['防火站檔案', stats.files],
             ['長輩站檔案', stats.elderFiles],
             ['睡眠站檔案', stats.sleepFiles],
+            ['AI劇場檔案', stats.dramaFiles],
             ['留言', stats.msgs],
             ['推播訂閱（防火站）', stats.push]
           ];
@@ -212,6 +214,16 @@
             renderStats();
           })
           .catch(function(){ stats.sleepFiles = '無法取得'; renderStats(); });
+        fetch('https://api.github.com/repos/terryboy122/ai-drama-guide/git/trees/main?recursive=1')
+          .then(function(r){ return r.json(); })
+          .then(function(t){
+            var total = 0;
+            (t.tree || []).forEach(function(n){ if(n.type === 'blob' && typeof n.size === 'number'){ total += n.size; } });
+            var fsize = total < 1024 ? total + ' 位元組' : (total < 1048576 ? (total / 1024).toFixed(1) + ' KB' : (total / 1048576).toFixed(2) + ' MB');
+            stats.dramaFiles = '約 ' + fsize;
+            renderStats();
+          })
+          .catch(function(){ stats.dramaFiles = '無法取得'; renderStats(); });
         if(msgs.length === 0){
           var empty = document.createElement('p');
           empty.className = 'status';
@@ -227,7 +239,7 @@
           head.className = 'msg-head';
           var badge = document.createElement('span');
           badge.className = 'site-badge';
-          badge.textContent = m.site === 'elder-safety-guide' ? '長輩居家安全' : m.site === 'sleep-environment-guide' ? '睡眠環境指南' : '防火情報站';
+          badge.textContent = m.site === 'elder-safety-guide' ? '長輩居家安全' : m.site === 'sleep-environment-guide' ? '睡眠環境指南' : m.site === 'ai-drama-guide' ? 'AI劇場' : '防火情報站';
           var name = document.createElement('span');
           name.className = 'msg-name';
           name.textContent = m.name;
