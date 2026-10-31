@@ -987,8 +987,8 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
         <label for="board-msg" style="display:block;margin-bottom:6px">留言內容</label>
         <textarea id="board-msg" name="message" rows="4" placeholder="寫下你的問題或建議…" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)"></textarea>
       </div>
-      <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>請勿填寫<input name="website" type="text" tabindex="-1" autocomplete="off"></label></div><button id="board-submit" class="btn" type="submit">送出留言</button><p id="board-status" style="margin:12px 0 0;color:var(--muted)"></p>
-      <p style="margin:12px 0 0;color:var(--muted)">留言只會傳給站主，僅供站主回覆使用，不會公開顯示在頁面上，也不會提供給第三方。</p>
+      <div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden" aria-hidden="true"><label>請勿填寫<input name="website" type="text" tabindex="-1" autocomplete="off"></label></div><div style="margin-bottom:12px"><label style="display:flex;gap:8px;align-items:flex-start"><input id="board-agree" type="checkbox" style="width:auto;margin-top:4px">我已閱讀並同意<a href="/privacy" target="_blank" rel="noopener">隱私權政策</a></label></div><button id="board-submit" class="btn" type="submit">送出留言</button><p id="board-status" style="margin:12px 0 0;color:var(--muted)"></p>
+      <p style="margin:12px 0 0;color:var(--muted)">留言只會傳給站主，僅供站主回覆使用，不會公開顯示在頁面上，也不會提供給第三方。送出前請閱讀<a href="/privacy" target="_blank" rel="noopener">隱私權政策</a>並勾選同意。</p>
     </form>
 <script>
 (function(){
@@ -1002,6 +1002,7 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
     var status = document.getElementById('board-status');
     var btn = document.getElementById('board-submit');
     if(!name || !msg){ status.textContent = '請填寫稱呼與留言內容。'; return; }
+    if(!document.getElementById('board-agree').checked){ status.textContent = '請先勾選同意隱私權政策。'; return; }
     btn.disabled = true;
     status.textContent = '傳送中…';
     fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name: name, message: msg, website: hp }) })
@@ -1039,7 +1040,7 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
   <div class="wrap">
     <p><b>緊急電話：119（火警／救護）・110（警察）</b>｜本頁教學原則依內政部消防署、臺南市政府消防局與消防防災館公開資料整理；案例均附原始來源，數據以來源公布為準，官方資訊如有更新以官方最新公告為準。</p>
     <p>資料最後查核：2026 年 10 月 28 日。本頁為非商業防災教育整理；影片與預覽圖版權屬於原作者，點擊後前往 YouTube 觀看原版影片。</p>
-    <p style="text-align:center">© 2026 防火情報站</p>
+    <p style="text-align:center">© 2026 防火情報站｜<a href="/privacy">隱私權政策</a></p>
   </div>
 </footer>
 
