@@ -78,15 +78,13 @@ nav.top .wrap{display:flex;gap:6px;flex-wrap:wrap;padding-top:10px;padding-botto
 nav.top a{white-space:nowrap;color:var(--ink-2);text-decoration:none;font-weight:700;font-size:14px;padding:7px 13px;border-radius:999px;border:1px solid var(--line);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 nav.top a:hover{color:var(--red);border-color:var(--red)}
 nav.top a.active{background:var(--red);border-color:var(--red);color:#fff}
-.nav-toggle{display:none;background:var(--red);color:#fff;border:0;border-radius:999px;padding:8px 18px;font-weight:700;font-size:14px;cursor:pointer}
-nav.top a.nav-gear{display:none;background:var(--red);color:#fff;border:0;border-radius:999px;padding:8px 18px;font-weight:700;font-size:14px;text-decoration:none}
+.nav-toggle,nav.top a.nav-gear{display:none;background:var(--red);color:#fff;border:0;border-radius:999px;padding:8px 18px;font-weight:700;font-size:14px;font-family:inherit;line-height:1.5;cursor:pointer;text-decoration:none;appearance:none;-webkit-appearance:none;vertical-align:middle}
 nav.top a.nav-gear:hover{color:#fff}
 section[id]{scroll-margin-top:76px}
 @media(max-width:700px){
   section[id]{scroll-margin-top:64px}
   nav.top{padding:8px 16px}
-  .nav-toggle{display:inline-block}
-  nav.top a.nav-gear{display:inline-block}
+  .nav-toggle,nav.top a.nav-gear{display:inline-block}
   nav.top .wrap{display:none}
   nav.top.open .wrap{display:flex;flex-direction:column;padding:12px 0 4px}
   nav.top.open .wrap a{text-align:center}
