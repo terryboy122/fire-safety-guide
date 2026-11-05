@@ -79,11 +79,14 @@ nav.top a{white-space:nowrap;color:var(--ink-2);text-decoration:none;font-weight
 nav.top a:hover{color:var(--red);border-color:var(--red)}
 nav.top a.active{background:var(--red);border-color:var(--red);color:#fff}
 .nav-toggle{display:none;background:var(--red);color:#fff;border:0;border-radius:999px;padding:8px 18px;font-weight:700;font-size:14px;cursor:pointer}
+nav.top a.nav-gear{display:none;background:var(--red);color:#fff;border:0;border-radius:999px;padding:8px 18px;font-weight:700;font-size:14px;text-decoration:none}
+nav.top a.nav-gear:hover{color:#fff}
 section[id]{scroll-margin-top:76px}
 @media(max-width:700px){
   section[id]{scroll-margin-top:64px}
   nav.top{padding:8px 16px}
   .nav-toggle{display:inline-block}
+  nav.top a.nav-gear{display:inline-block}
   nav.top .wrap{display:none}
   nav.top.open .wrap{display:flex;flex-direction:column;padding:12px 0 4px}
   nav.top.open .wrap a{text-align:center}
@@ -206,6 +209,7 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
 
 <nav class="top" aria-label="頁面導覽">
   <button id="nav-toggle" class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links">☰ 目錄</button>
+  <a class="nav-gear" href="#gear">消防用品</a>
   <div class="wrap" id="nav-links">
     <a class="nav-link" href="#latest">最新火災</a>
     <a class="nav-link" href="#latest-videos">最新影片</a>
@@ -230,7 +234,7 @@ footer p{font-size:13px;color:var(--muted);margin-bottom:6px}
     var open = nav.classList.toggle('open');
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
   });
-  nav.querySelectorAll('a.nav-link').forEach(function(a){
+  nav.querySelectorAll('a.nav-link, a.nav-gear').forEach(function(a){
     a.addEventListener('click', function(){
       nav.classList.remove('open');
       btn.setAttribute('aria-expanded', 'false');
