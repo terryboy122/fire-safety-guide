@@ -1,10 +1,115 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
   <url>
     <loc>https://fire-safety-guide.pages.dev/</loc>
-    <lastmod>2026-10-29</lastmod>
+    <lastmod>2026-11-06</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/m1cct85wsVk/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>《我跟 Fireman 請示過｜祖厝除三害》</video:title>
+      <video:description>消防署防火宣導片：連動型住警器、樓梯間不堆雜物、高齡者居家防火重點，一次講完，適合全家一起看。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=m1cct85wsVk</video:content_loc>
+      <video:publication_date>2024-12-04</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/q-6SzN6wQ3o/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>可能性調查署：火災逃生迷思破解</video:title>
+      <video:description>往上逃？濕毛巾摀口鼻？用動畫逐一破解錯誤逃生知識，內容與消防員蔡宗翰《打火哥的 30 堂烈焰求生課》合作。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=q-6SzN6wQ3o</video:content_loc>
+      <video:publication_date>2020-04-24</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/oQMLIpCp-D8/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>消防署：火場生存術（完整版）</video:title>
+      <video:description>消防署官方逃生教學完整版：從發現火災、示警、報案到逃生與避難，整套生存術一次講完。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=oQMLIpCp-D8</video:content_loc>
+      <video:publication_date>2022-05-25</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/99TERJ5MDSo/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>消防署《消防第二部曲》：火災發生時怎麼辦？</video:title>
+      <video:description>大聲示警、打 119、不要躲浴室、往一樓逃、關門避難，火災當下的應變步驟完整示範。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=99TERJ5MDSo</video:content_loc>
+      <video:publication_date>2019-04-10</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/1A87wFAJAXw/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>新北消防：小精靈火場逃生</video:title>
+      <video:description>50 秒懷舊遊戲風：不躲浴室、煙每秒上升 3–5 公尺、關門避難、小火快逃濃煙關門，適合全家一起看。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=1A87wFAJAXw</video:content_loc>
+      <video:publication_date>2022-07-03</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/huHcr5Zg-0Y/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>公視：大型場域火警如何自救？</video:title>
+      <video:description>工廠、賣場等不熟環境的大場域：大聲示警後跟著逃生指示燈，方向向下及向外，保持冷靜。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=huHcr5Zg-0Y</video:content_loc>
+      <video:publication_date>2023-04-25</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/D7vw8u4TR98/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>防火不是靠運氣｜居家防火 8 大重點，一次看懂！</video:title>
+      <video:description>居家防火 8 大重點一次講完，適合快速複習。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=D7vw8u4TR98</video:content_loc>
+      <video:publication_date>2026-08-21</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/5fKrUx5ho54/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>公視獨立特派員：城中城，後來呢</video:title>
+      <video:description>城中城大火五週年回顧（2026-10-14 播出）：舊址改建公園後，老舊大樓安全管理到底改變了多少？</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=5fKrUx5ho54</video:content_loc>
+      <video:publication_date>2026-10-14</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/IxmYbnnh9lQ/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>TVBS：小火快逃．濃煙關門救了社區 17 人</video:title>
+      <video:description>真實社區火災：住戶聽消防隊員指示關門關窗待在屋內，等滅火後再下樓，關門救命的最好證明。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=IxmYbnnh9lQ</video:content_loc>
+      <video:publication_date>2025-11-16</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/GVHVT2FTasY/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>公視我們的島：明揚惡火燒出哪些問題？</video:title>
+      <video:description>屏東明揚工廠大火專題，消防安全專家林金宏分析化學工廠火災為何失控、企業責任與管理該怎麼改。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=GVHVT2FTasY</video:content_loc>
+      <video:publication_date>2023-09-23</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/y65jR6y6drU/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>公視我們的島【公害】烈焰的指引：敬鵬大火</video:title>
+      <video:description>2018 年桃園敬鵬工廠大火，燒出工業區管理問題。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=y65jR6y6drU</video:content_loc>
+      <video:publication_date>2018-05-08</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/hwztgPDbBfo/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>TVBS 社會檔案：台中衛爾康惡火</video:title>
+      <video:description>1995 年台中衛爾康西餐廳大火，64 死，台灣單一建築物死傷最慘的一場，事後促成消防法大修。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=hwztgPDbBfo</video:content_loc>
+      <video:publication_date>2026-08-22</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/OQxDJLivThU/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>三立新聞：新屋保齡球館大火</video:title>
+      <video:description>2015 年桃園新屋保齡球館閃燃，6 名消防員殉職、僅 1 人生還。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=OQxDJLivThU</video:content_loc>
+      <video:publication_date>2018-04-29</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/lNLEt7HFmKk/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>華視新聞雜誌：我家安全嗎？高樓建築消防生存戰</video:title>
+      <video:description>從新竹晴空匯 2 名消防員殉職，談高樓建築的消防設備與救援難題。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=lNLEt7HFmKk</video:content_loc>
+      <video:publication_date>2024-10-14</video:publication_date>
+    </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/70nUy1sWCcw/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>公視獨立特派員：大型活動SOS（八仙塵爆）</video:title>
+      <video:description>從八仙樂園粉塵爆炸談起：大型活動的安全防備與緊急救護觀念夠不夠，參加民眾該注意什麼。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=70nUy1sWCcw</video:content_loc>
+      <video:publication_date>2015-07-16</video:publication_date>
+    </video:video>
   </url>
   <url>
     <loc>https://fire-safety-guide.pages.dev/privacy</loc>
