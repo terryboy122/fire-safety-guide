@@ -110,6 +110,13 @@
       <video:content_loc>https://www.youtube.com/watch?v=70nUy1sWCcw</video:content_loc>
       <video:publication_date>2015-07-16</video:publication_date>
     </video:video>
+    <video:video>
+      <video:thumbnail_loc>https://i.ytimg.com/vi/dSd_Sbxdqy8/hqdefault.jpg</video:thumbnail_loc>
+      <video:title>住警器宣導-【涅槃重生】新北市海山防宣分隊榮獲新北市消防局115年義消防宣創意宣導競賽-特優獎</video:title>
+      <video:description>新北市消防局義消防宣創意宣導競賽特優獎作品：以「重生」故事宣導住警器「及早發現、及早通知、及早逃生」，並點出延長線負載過度、神明廳老舊燈具等居家常見起火原因。</video:description>
+      <video:content_loc>https://www.youtube.com/watch?v=dSd_Sbxdqy8</video:content_loc>
+      <video:publication_date>2026-11-05</video:publication_date>
+    </video:video>
   </url>
   <url>
     <loc>https://fire-safety-guide.pages.dev/privacy</loc>
